@@ -26,6 +26,9 @@ $forwardUrl = $response->getHeader('Location');
 $request =  $client->get($forwardUrl);
 $response = $request->send();
 
+$request = $client->get('/api/programmers');
+$response = $request->send();
+
 echo $response;
 echo "\n\n";
 

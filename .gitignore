@@ -1,2 +1,5 @@
 /.idea
 docker-compose.yml
+codeBattles/data
+codeBattles/logs
+codeBattles/vendor
