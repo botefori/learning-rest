@@ -21,6 +21,7 @@ $data = array(
 $request = $client->post('/api/programmers', null, json_encode($data));
 $response = $request->send();
 
+
 $forwardUrl = $response->getHeader('Location');
 
 $request =  $client->get($forwardUrl);
@@ -30,5 +31,4 @@ $request = $client->get('/api/programmers');
 $response = $request->send();
 
 echo $response;
-echo "\n\n";
-
+echo "\n\n";die();
