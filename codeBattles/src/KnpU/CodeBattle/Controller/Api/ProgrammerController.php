@@ -5,6 +5,7 @@ namespace KnpU\CodeBattle\Controller\Api;
 use KnpU\CodeBattle\Controller\BaseController;
 use KnpU\CodeBattle\Model\Programmer;
 use Silex\ControllerCollection;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -28,6 +29,15 @@ class ProgrammerController extends BaseController
 
         $this->handleRequest($request, $programmer);
 
+        $errors = $this->validate($programmer);
+
+         if(!empty($errors)){
+
+             return $this->handleValidationResponse($errors);
+         }
+
+        $this->save($programmer);
+
         $url = $this->generateUrl('api_programmers_show', array(
            'nickname' =>$programmer->nickname,
         ));
@@ -50,7 +60,17 @@ class ProgrammerController extends BaseController
             $this->throw404('Oh no! this programmer has deserted! We\'ll send a search party!');
         }
 
-       $this->handleRequest($request, $programmer);
+        $this->handleRequest($request, $programmer);
+
+        $errors = $this->validate($programmer);
+
+        if(!empty($errors)){
+
+            return $this->handleValidationResponse($errors);
+        }
+
+        $this->save($programmer);
+
         $data = $this->serializeProgrammer($programmer);
 
         $response = new Response(json_encode($data), 200);
@@ -149,8 +169,18 @@ class ProgrammerController extends BaseController
         $programmer->userId = $this->findUserByUsername('weaverryan')->id;
 
 
-        $this->save($programmer);
+    }
 
+    private function handleValidationResponse(array $errors)
+    {
+
+        $data = array(
+            'type' => 'validation_error',
+            'title' => 'There was validation errors',
+            'errors' => $errors
+        );
+
+        return new JsonResponse($data, 400);
     }
 
 }
