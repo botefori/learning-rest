@@ -17,6 +17,7 @@ class ProgrammerController extends BaseController
         $controllers->get('/api/programmers/{nickname}', array($this, 'showAction'))
         ->bind('api_programmers_show');
         $controllers->put('/api/programmers/{nickname}', array($this, 'updateAction'));
+        $controllers->delete('/api/programmers/{nickname}', array($this, 'deleteAction'));
     }
 
     public function newAction(Request $request)
@@ -71,6 +72,21 @@ class ProgrammerController extends BaseController
         $response->headers->set('Content-Type', 'application/json');
         return $response;
     }
+
+    public function deleteAction($nickname)
+    {
+        $programmer = $this->getProgrammerRepository()
+            ->findOneByNickname($nickname);
+
+        if (!$programmer) {
+            $this->throw404('Oh no! this programmer has deserted! We\'ll send a search party!');
+        }else{
+            $this->delete($programmer);
+        }
+
+        return new Response(null, 204);
+    }
+
 
     public function listAction()
     {
