@@ -15,8 +15,10 @@ class ProgrammerController extends BaseController
         $controllers->post('/api/programmers', array($this, 'newAction'));
         $controllers->get('/api/programmers', array($this, 'listAction'));
         $controllers->get('/api/programmers/{nickname}', array($this, 'showAction'))
-        ->bind('api_programmers_show');
+                    ->bind('api_programmers_show');
         $controllers->put('/api/programmers/{nickname}', array($this, 'updateAction'));
+        $controllers->match('/api/programmers/{nickname}', array($this, 'updateAction'))
+                    ->method('PATCH');
         $controllers->delete('/api/programmers/{nickname}', array($this, 'deleteAction'));
     }
 
@@ -134,6 +136,12 @@ class ProgrammerController extends BaseController
             $apiProperty[] = 'nickname';
         }
         foreach ($apiProperty as $property){
+
+            // if PATCH and the field isn't sent, just skip it!
+            if($request->isMethod('PATCH') && !isset($data[$property])){
+                continue;
+            }
+
             $val = isset($data[$property]) ? $data[$property] : null;
             $programmer->$property = $val;
         }
