@@ -44,7 +44,7 @@ Feature: Programmer
     Given I have the payload:
       """
       {
-        "nickname": "CowboyCoder",
+        "nickname": "CowgirlCoder",
         "avatarNumber" : "2",
         "tagLine": "I'm from a test!"
       }
@@ -52,3 +52,4 @@ Feature: Programmer
     When I request "PUT /api/programmers/CowboyCoder"
     Then the response status code should be 200
     And the "avatarNumber" property should equal "2"
+    And the "nickname" property should equal "CowboyCoder"
