@@ -3,6 +3,7 @@
 namespace KnpU\CodeBattle\Controller\Api;
 
 use KnpU\CodeBattle\Api\ApiProblem;
+use KnpU\CodeBattle\Api\ApiProblemException;
 use KnpU\CodeBattle\Controller\BaseController;
 use KnpU\CodeBattle\Model\Programmer;
 use Silex\ControllerCollection;
@@ -34,7 +35,7 @@ class ProgrammerController extends BaseController
 
          if(!empty($errors)){
 
-             return $this->handleValidationResponse($errors);
+             return $this->throwApiProblemValidationException($errors);
          }
 
         $this->save($programmer);
@@ -67,7 +68,7 @@ class ProgrammerController extends BaseController
 
         if(!empty($errors)){
 
-            return $this->handleValidationResponse($errors);
+            return $this->throwApiProblemValidationException($errors);
         }
 
         $this->save($programmer);
@@ -145,7 +146,10 @@ class ProgrammerController extends BaseController
         $data = json_decode($request->getContent(), true);
 
         if($data === null){
-            throw new \Exception('Invalid JSON !!!!'.$request->getContent());
+
+            $apiProblem = new ApiProblem(400, ApiProblem::TYPE_INVALID_REQUEST_BODY_FORMAT);
+
+            throw new ApiProblemException($apiProblem);
         }
 
         $isNew = !$programmer->id;
@@ -172,7 +176,7 @@ class ProgrammerController extends BaseController
 
     }
 
-    private function handleValidationResponse(array $errors)
+    private function throwApiProblemValidationException(array $errors)
     {
 
         $apiProblem = new ApiProblem(
@@ -182,13 +186,8 @@ class ProgrammerController extends BaseController
 
         $apiProblem->set('errors', $errors);
 
-        $response = new JsonResponse(
-            $apiProblem->toArray(),
-            $apiProblem->getStatusCode()
-        );
-        $response->headers->set('Content-Type', 'application/problem+json');
+        throw new ApiProblemException($apiProblem);
 
-        return $response;
     }
 
 }
