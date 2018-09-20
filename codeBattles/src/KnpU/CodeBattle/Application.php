@@ -3,6 +3,7 @@
 namespace KnpU\CodeBattle;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use KnpU\CodeBattle\Api\ApiProblem;
 use KnpU\CodeBattle\Api\ApiProblemException;
 use KnpU\CodeBattle\Battle\PowerManager;
 use KnpU\CodeBattle\Repository\BattleRepository;
@@ -288,16 +289,28 @@ class Application extends SilexApplication
 
     private function configureListeners()
     {
-       $this->error(function (\Exception $exception, $statusCode){
+        $app = $this;
 
-           if(!$exception instanceof ApiProblemException){
-             return ;
+       $this->error(function (\Exception $exception, $statusCode) use ($app){
+
+           if(strpos($app['request']->getPathInfo(), '/api') !== 0){
+               return ;
+           }
+           if($exception instanceof ApiProblemException){
+               $apiProblem = $exception->getApiProblem();
+           }else{
+               $apiProblem = new ApiProblem($statusCode);
            }
 
-           $apiProblem = $exception->getApiProblem();
+           $data = $apiProblem->toArray();
+
+           if($data['type'] !== 'about:blank')
+           {
+               $data['type'] = 'http://code.battles.docker/docs/errors'.$data['type'];
+           }
 
            $response = new JsonResponse(
-               $apiProblem->toArray(),
+               $data,
                $apiProblem->getStatusCode()
            );
            $response->headers->set('Content-Type', 'application/problem+json');
