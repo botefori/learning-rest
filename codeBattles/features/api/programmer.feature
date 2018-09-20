@@ -75,6 +75,7 @@ Feature: Programmer
     And the "Content-Type" header should be "application/problem+json"
     And the "type" property should equal "about:blank"
     And the "title" property should equal "Not Found"
+    And the "details" property should contain "programmer has deserted"
 
 
   Scenario: PUT to edit a programmer
